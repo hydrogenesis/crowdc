@@ -40,7 +40,7 @@ static int throttle_process_worker(LPVOID lpVoid) {
 		if (current_usage > 100.0) current_usage = 100.0;
 		if (current_usage < 0.0) current_usage = 0.0;
 
-		int delta = current_usage - (100 - ti.percentage);
+		int delta = (int)current_usage - (100 - ti.percentage);
 		percentage += delta;
 		// set throttle percentage between [ti.percentage, 100]
 		if (percentage > 100) percentage = 100;

@@ -16,6 +16,18 @@ typedef struct {
 	std::atomic_bool should_stop;	// specifies whether the throttling should stop
 } ThrottleInfo, *LPThrottleInfo;
 
+typedef struct {
+	PROCESS_INFORMATION pi;
+	ThrottleInfo ti;
+	HANDLE handle;
+	boolean exec_succeed;
+} ThrottledProcess, *LPThrottledProcess;
+
+typedef struct {
+	long timestamp;
+	long check_interval;
+} MetaData, *LPMetaData;
+
 // returns throttle thread handle
 HANDLE create_throttle_thread(LPThrottleInfo throttle_info);
 unsigned __stdcall throttle_process(LPVOID lpVoid);
