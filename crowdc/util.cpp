@@ -1,14 +1,21 @@
 #include "util.h"
 #include <tlhelp32.h>
 #include <locale.h>
+
 #include <process.h>
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "Pdh.lib")
 
 // throttle process by certain percentage
 static int throttle_process_worker(LPVOID lpVoid) {
 	ThrottleInfo& ti = *(LPThrottleInfo) lpVoid;
 	DWORD thread_id[MAX_THREAD_CNT];
 	HANDLE thread_handle[MAX_THREAD_CNT];
+	PDH_HQUERY cpu_query;
+	PDH_HCOUNTER cpu_total;
+	init_cpu_usage(&cpu_query, &cpu_total);
+	int percentage = ti.percentage;
+
 	while (!ti.should_stop) {
 		// Refresh threads
 		int num_threads = ListProcessThreads(ti.process_id, thread_id);
@@ -28,10 +35,20 @@ static int throttle_process_worker(LPVOID lpVoid) {
 			Sleep(1000UL);	// sleep for 1 second
 			continue;
 		}
+		
+		double current_usage = get_cpu_usage(&cpu_query, &cpu_total);
+		if (current_usage > 100.0) current_usage = 100.0;
+		if (current_usage < 0.0) current_usage = 0.0;
 
+		int delta = current_usage - (100 - ti.percentage);
+		percentage += delta;
+		// set throttle percentage between [ti.percentage, 100]
+		if (percentage > 100) percentage = 100;
+		if (percentage < ti.percentage) percentage = ti.percentage;
+		
 		DWORD time_elapsed = 0;
-		DWORD time_throttle = ti.throttle_time * ti.percentage / 100;
-		DWORD time_normal = ti.throttle_time * (100 - ti.percentage) / 100;;
+		DWORD time_throttle = ti.throttle_time * percentage / 100;
+		DWORD time_normal = ti.throttle_time * (100 - percentage) / 100;
 		while (time_elapsed < (DWORD) ti.revisit_time && !ti.should_stop) {
 			// Suspend all threads regardlessly
 			for (int i = 0; i < num_threads; ++i) {
@@ -151,4 +168,47 @@ int ListProcessThreads( DWORD dwOwnerPID, DWORD * dwThreadIdTable )
 
 	CloseHandle( hThreadSnap );
 	return iThreadCount;
+}
+
+unsigned int split(const std::string &txt, std::vector<std::string> *strs, char ch)
+{
+    unsigned int pos = txt.find( ch );
+    unsigned int initialPos = 0;
+    strs->clear();
+
+    // Decompose statement
+    while( pos != std::string::npos ) {
+        strs->push_back( txt.substr( initialPos, pos - initialPos ) );
+        initialPos = pos + 1;
+
+        pos = txt.find( ch, initialPos );
+    }
+
+    // Add the last one
+    strs->push_back( txt.substr( initialPos, min( pos, txt.size() ) - initialPos ) );
+
+    return strs->size();
+}
+
+void join(const std::vector<std::string>& strs, std::string* out, const std::string& delim, int begin, int end) {
+	if (end < begin) return;
+	if (strs.size() < (std::size_t) end) return;
+	out->clear();
+	for (int i = begin; i < end; ++i) {
+		out->append(strs[i]);
+		if (i < end - 1) out->append(delim);
+	}
+}
+
+void init_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total) {
+	PdhOpenQuery(NULL, NULL, cpu_query);
+    PdhAddCounter(*cpu_query, L"\\Processor(_Total)\\% Processor Time", NULL, cpu_total);
+    PdhCollectQueryData(*cpu_query);
+}
+
+double get_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total) {
+	PDH_FMT_COUNTERVALUE counterVal;
+    PdhCollectQueryData(*cpu_query);
+    PdhGetFormattedCounterValue(*cpu_total, PDH_FMT_DOUBLE, NULL, &counterVal);
+    return counterVal.doubleValue;
 }

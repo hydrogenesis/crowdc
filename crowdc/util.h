@@ -1,6 +1,10 @@
 #pragma once
 #include <windows.h>
 #include <atomic>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include "pdh.h"
 
 #define MAX_THREAD_CNT 256
 
@@ -17,6 +21,14 @@ HANDLE create_throttle_thread(LPThrottleInfo throttle_info);
 unsigned __stdcall throttle_process(LPVOID lpVoid);
 static int throttle_process_worker(LPVOID lpVoid);
 int ListProcessThreads( DWORD dwOwnerPID, DWORD * dwThreadIdTable );
+
+// string funcs
+unsigned int split(const std::string &txt, std::vector<std::string> *strs, char ch);
+void join(const std::vector<std::string>& strs, std::string* out, const std::string& delim, int begin, int end);
+
+// get cpu usage
+void init_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total);
+double get_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total);
 
 HANDLE
 CreateThread1(
