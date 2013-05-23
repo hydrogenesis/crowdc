@@ -41,12 +41,26 @@ boolean execute_cmd(const std::string& exe, const std::string& cmd_line) {
 		printf( "CreateProcess failed (%d).\n", GetLastError() );
 		return false;
 	}
+
+	ThrottleInfo ti;
+	ti.percentage = 20;
+	ti.process_id = pi.dwProcessId;
+	ti.revisit_time = 10000;
+	ti.should_stop = false;
+	ti.throttle_time = 100;
+
+	HANDLE thread = create_throttle_thread(&ti);
+	
+
 	// Wait until child process exits.
-    WaitForSingleObject( pi.hProcess, INFINITE );
+    WaitForSingleObject(pi.hProcess, INFINITE);
+	ti.should_stop = true;
+	WaitForSingleObject(thread, INFINITE);
 
     // Close process and thread handles. 
     CloseHandle( pi.hProcess );
     CloseHandle( pi.hThread );
+	CloseHandle(thread);
 	return true;
 }
 

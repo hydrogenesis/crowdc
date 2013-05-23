@@ -12,6 +12,18 @@ typedef struct {
 	std::atomic_bool should_stop;	// specifies whether the throttling should stop
 } ThrottleInfo, *LPThrottleInfo;
 
+// returns throttle thread handle
+HANDLE create_throttle_thread(LPThrottleInfo throttle_info);
 unsigned __stdcall throttle_process(LPVOID lpVoid);
 static int throttle_process_worker(LPVOID lpVoid);
 int ListProcessThreads( DWORD dwOwnerPID, DWORD * dwThreadIdTable );
+
+HANDLE
+CreateThread1(
+    __in_opt  LPSECURITY_ATTRIBUTES lpThreadAttributes,
+    __in      SIZE_T dwStackSize,
+    __in      unsigned (__stdcall * lpStartAddress)(void *),
+    __in_opt  LPVOID lpParameter,
+    __in      DWORD dwCreationFlags,
+    __out_opt LPDWORD lpThreadId
+    );
