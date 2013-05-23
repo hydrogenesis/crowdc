@@ -4,6 +4,10 @@
 #include <windows.h> 
 #include <urlmon.h>
 #include <string>
+#include <atomic>
+
+#include "util.h"
+
 #pragma comment(lib, "urlmon.lib")
 
 inline HRESULT download_file_from_url(const std::string& base_url, const std::string& file_name) {
