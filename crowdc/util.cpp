@@ -1,8 +1,9 @@
 #include "util.h"
 #include <tlhelp32.h>
 #include <locale.h>
-
+#include <fstream>
 #include <process.h>
+#include "md5.h"
 #pragma comment(lib, "Winmm.lib")
 #pragma comment(lib, "Pdh.lib")
 
@@ -211,4 +212,14 @@ double get_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total) {
     PdhCollectQueryData(*cpu_query);
     PdhGetFormattedCounterValue(*cpu_total, PDH_FMT_DOUBLE, NULL, &counterVal);
     return counterVal.doubleValue;
+}
+
+boolean calc_file_md5_string(const std::string& file, std::string* md5string) {
+	std::ifstream ifs(file);
+	if (!ifs.good()) return false;
+	ifs.close();
+
+	MD5 md5;
+	md5string->assign(md5.digestFile(file.c_str()));
+	return true;
 }

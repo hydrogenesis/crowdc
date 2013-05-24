@@ -42,6 +42,9 @@ void join(const std::vector<std::string>& strs, std::string* out, const std::str
 void init_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total);
 double get_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total);
 
+// md5
+boolean calc_file_md5_string(const std::string& file, std::string* md5string);
+
 HANDLE
 CreateThread1(
     __in_opt  LPSECURITY_ATTRIBUTES lpThreadAttributes,

@@ -178,10 +178,15 @@ void execute_cmd_list(const std::string& cmd_list_file, LPThrottledProcess tp) {
 			std::string cmd_line;
 			join(tokens, &cmd_line, " ", 1, tokens.size());
 			if (!execute_cmd(exe, cmd_line)) break;
-		} else if (tokens[0] == "download" && tokens.size() == 3) {
+		} else if (tokens[0] == "download" && tokens.size() > 3) {
 			// download a file
 			std::string url = tokens[1];
 			std::string file = tokens[2];
+			std::string md5 = tokens[3];
+			std::string local_md5;
+			if (calc_file_md5_string(file, &local_md5) && md5 == local_md5) {
+				continue;
+			}
 			if (S_OK != download_url_to_file(url, file)) break;
 		} else if (tokens[0] == "throttle" && tokens.size() > 4) {
 			// execute a command with throttle control
