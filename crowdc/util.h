@@ -45,6 +45,9 @@ double get_cpu_usage(PDH_HQUERY* cpu_query, PDH_HCOUNTER* cpu_total);
 // md5
 boolean calc_file_md5_string(const std::string& file, std::string* md5string);
 
+// uuid
+boolean create_uuid_string(std::string* uuid);
+
 HANDLE
 CreateThread1(
     __in_opt  LPSECURITY_ATTRIBUTES lpThreadAttributes,

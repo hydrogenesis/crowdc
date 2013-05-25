@@ -14,10 +14,13 @@
 #pragma comment(lib, "urlmon.lib")
 #pragma comment(lib, "Kernel32.lib")
 
+static std::string* uuid;
+
 inline void add_params_to_url(const std::string& input, std::string* output) {
 	output->append(input);
-	output->append("?");
-	output->append("ts=");
+	output->append("?uuid=");
+	output->append(*uuid);
+	output->append("&ts=");
 	char timestamp[256];
 	sprintf_s(timestamp, "%lld", time(NULL));
 	output->append(timestamp);
@@ -84,7 +87,7 @@ boolean execute_cmd_with_throttle(const std::string& exe,
 	si.wShowWindow = SW_HIDE;
 	si.hStdError = stderr;
 	si.hStdOutput = stdout;
-    ZeroMemory( &(tp->pi), sizeof(tp->pi) );
+    ZeroMemory( &(tp->pi), sizeof(tp->pi) );	
 	if( !CreateProcessA( (LPSTR)(exe.c_str()),   // No module name (use command line)
 		(LPSTR)(cmd_line.c_str()),        // Command line
         NULL,           // Process handle not inheritable
@@ -205,6 +208,14 @@ void execute_cmd_list(const std::string& cmd_list_file, LPThrottledProcess tp) {
 
 int main(int argc, char* argv[])
 {
+	// global initializers
+	uuid = new std::string();
+	if (!create_uuid_string(uuid)) {
+		char timestamp[256];
+		sprintf_s(timestamp, "%lld", time(NULL));
+		uuid->assign(timestamp);
+	}
+
 	boolean has_console = AttachConsole(ATTACH_PARENT_PROCESS);
 	if (has_console) {
 		// console

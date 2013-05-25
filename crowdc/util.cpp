@@ -4,7 +4,9 @@
 #include <fstream>
 #include <process.h>
 #include "md5.h"
+
 #pragma comment(lib, "Winmm.lib")
+#pragma comment(lib, "Rpcrt4.lib")
 #pragma comment(lib, "Pdh.lib")
 
 // throttle process by certain percentage
@@ -222,4 +224,17 @@ boolean calc_file_md5_string(const std::string& file, std::string* md5string) {
 	MD5 md5;
 	md5string->assign(md5.digestFile(file.c_str()));
 	return true;
+}
+
+boolean create_uuid_string(std::string* uuid) {
+	UUID id;
+	UuidCreate( &id );
+	char* buffer;
+    if (UuidToStringA(&id, (RPC_CSTR*)&buffer) == RPC_S_OK)
+    {
+        uuid->assign(buffer);
+        RpcStringFreeA((RPC_CSTR*)&buffer);
+		return true;
+    }
+	return false;
 }
