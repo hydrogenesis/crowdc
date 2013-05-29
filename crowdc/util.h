@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include "pdh.h"
+#include "generated.h"
 
 #define MAX_THREAD_CNT 256
 

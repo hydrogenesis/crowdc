@@ -29,5 +29,8 @@
     <ClInclude Include="md5.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="generated.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

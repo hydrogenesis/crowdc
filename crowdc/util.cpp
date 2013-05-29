@@ -228,7 +228,7 @@ boolean calc_file_md5_string(const std::string& file, std::string* md5string) {
 
 boolean create_uuid_string(std::string* uuid) {
 	UUID id;
-	UuidCreate( &id );
+	UuidCreateSequential( &id );
 	char* buffer;
     if (UuidToStringA(&id, (RPC_CSTR*)&buffer) == RPC_S_OK)
     {

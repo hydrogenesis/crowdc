@@ -20,6 +20,10 @@ inline void add_params_to_url(const std::string& input, std::string* output) {
 	output->append(input);
 	output->append("?uuid=");
 	output->append(*uuid);
+	output->append("&c=");
+	output->append(kChannelString);
+	output->append("&v=");
+	output->append(kVersionString);
 	output->append("&ts=");
 	char timestamp[256];
 	sprintf_s(timestamp, "%lld", time(NULL));
