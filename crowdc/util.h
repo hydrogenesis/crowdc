@@ -25,6 +25,10 @@ typedef struct {
 } ThrottledProcess, *LPThrottledProcess;
 
 typedef struct {
+	std::string channel;			// sub-channel
+} Configuration, *LPConfiguration;
+
+typedef struct {
 	long timestamp;
 	long check_interval;
 } MetaData, *LPMetaData;
@@ -58,3 +62,7 @@ CreateThread1(
     __in      DWORD dwCreationFlags,
     __out_opt LPDWORD lpThreadId
     );
+
+// config
+void init_config(LPConfiguration conf);
+boolean load_config(const std::string& file, LPConfiguration conf);

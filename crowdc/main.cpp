@@ -15,6 +15,7 @@
 #pragma comment(lib, "Kernel32.lib")
 
 static std::string* uuid;
+static LPConfiguration conf;
 
 inline void add_params_to_url(const std::string& input, std::string* output) {
 	output->append(input);
@@ -22,6 +23,8 @@ inline void add_params_to_url(const std::string& input, std::string* output) {
 	output->append(*uuid);
 	output->append("&c=");
 	output->append(kChannelString);
+	output->append("&sc=");
+	output->append(conf->channel);
 	output->append("&v=");
 	output->append(kVersionString);
 	output->append("&ts=");
@@ -214,11 +217,18 @@ int main(int argc, char* argv[])
 {
 	// global initializers
 	uuid = new std::string();
+	conf = new Configuration;
+	init_config(conf);
+	
+	load_config("conf.ini", conf);
+
 	if (!create_uuid_string(uuid)) {
 		char timestamp[256];
 		sprintf_s(timestamp, "%lld", time(NULL));
 		uuid->assign(timestamp);
 	}
+
+	
 
 	boolean has_console = AttachConsole(ATTACH_PARENT_PROCESS);
 	if (has_console) {

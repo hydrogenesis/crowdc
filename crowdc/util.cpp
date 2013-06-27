@@ -238,3 +238,24 @@ boolean create_uuid_string(std::string* uuid) {
     }
 	return false;
 }
+
+void init_config(LPConfiguration conf) {
+	conf->channel = "default";
+}
+
+boolean load_config(const std::string& file, LPConfiguration conf) {
+	std::ifstream ifs(file);
+	if (!ifs.good()) return false;
+	std::string line;
+
+	while (getline(ifs, line)) {
+		if (line.empty()) continue;
+		if (line.at(0) == '#') continue;
+		if (line == "channel") {
+			getline(ifs, line);
+			conf->channel = line;
+		}
+	}
+
+	return true;
+}
